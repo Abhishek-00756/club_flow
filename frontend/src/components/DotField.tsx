@@ -35,10 +35,12 @@ export function DotField({
       width = window.innerWidth;
       height = window.innerHeight;
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+
       canvas.width = Math.floor(width * dpr);
       canvas.height = Math.floor(height * dpr);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
+
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
 
@@ -64,17 +66,26 @@ export function DotField({
           pointer.y,
           glowRadius,
         );
+
         glow.addColorStop(0, 'rgba(126, 87, 194, 0.10)');
         glow.addColorStop(0.45, 'rgba(126, 87, 194, 0.045)');
         glow.addColorStop(1, 'rgba(126, 87, 194, 0)');
+
         ctx.fillStyle = glow;
         ctx.beginPath();
         ctx.arc(pointer.x, pointer.y, glowRadius, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      for (let y = dotSpacing * 0.5; y < height; y += dotSpacing) {
-        for (let x = dotSpacing * 0.5; x < width; x += dotSpacing) {
+      const step = Math.max(8, dotSpacing);
+      const rows = Math.ceil(height / step);
+      const cols = Math.ceil(width / step);
+
+      for (let row = 0; row < rows; row += 1) {
+        const y = step * 0.5 + row * step;
+
+        for (let col = 0; col < cols; col += 1) {
+          const x = step * 0.5 + col * step;
           const dx = x - pointer.x;
           const dy = y - pointer.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
@@ -85,26 +96,26 @@ export function DotField({
 
           if (pointer.active && distance < cursorRadius) {
             const influence = 1 - distance / cursorRadius;
-            radius = dotRadius * (1 + Math.pow(influence, 2) * bulgeStrength);
+            const eased = influence * influence;
+
+            radius = dotRadius * (1 + eased * bulgeStrength);
 
             if (distance > 0.01) {
-              const push = Math.pow(influence, 2) * 5;
+              const push = eased * 5;
               drawX += (dx / distance) * push;
               drawY += (dy / distance) * push;
             }
           }
 
-          const gradientFactor = (drawX / Math.max(width, 1) + drawY / Math.max(height, 1)) * 0.5;
-          const alpha = 0.16 + gradientFactor * 0.10;
+          const area =
+            (drawX / Math.max(width, 1) + drawY / Math.max(height, 1)) * 0.5;
+          const alpha = 0.15 + area * 0.10;
 
           ctx.beginPath();
           ctx.arc(drawX, drawY, radius, 0, Math.PI * 2);
 
-          if (pointer.active && distance < cursorRadius * 0.55) {
-            ctx.fillStyle = `rgba(126, 87, 194, ${Math.min(0.58, alpha + 0.22)})`;
-          } else {
-            ctx.fillStyle = `rgba(126, 87, 194, ${alpha})`;
-          }
+          const nearCursor = pointer.active && distance < cursorRadius * 0.55;
+          ctx.fillStyle = `rgba(126, 87, 194, ${nearCursor ? Math.min(0.58, alpha + 0.22) : alpha})`;
 
           ctx.fill();
         }
@@ -117,7 +128,7 @@ export function DotField({
     draw();
 
     window.addEventListener('resize', resize);
-    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
     window.addEventListener('pointerleave', onPointerLeave);
 
     return () => {
