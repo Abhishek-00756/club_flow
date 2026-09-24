@@ -1,0 +1,63 @@
+# Local development stack: docker compose up --build
+#   App:      http://localhost:5173   (frontend, when running `npm run dev` or the frontend service)
+#   API:      http://localhost:8080   (Swagger UI at /swagger-ui.html)
+#   Mail UI:  http://localhost:8025   (every email the app sends lands here, nothing leaves your machine)
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: clubflow
+      POSTGRES_USER: clubflow
+      POSTGRES_PASSWORD: clubflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clubflow -d clubflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mail:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"   # web UI
+      - "1025:1025"   # SMTP
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+      mail:
+        condition: service_started
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/clubflow
+      DB_USER: clubflow
+      DB_PASSWORD: clubflow
+      MAIL_HOST: mail
+      MAIL_PORT: 1025
+      MAIL_ENABLED: "true"
+      FRONTEND_URL: http://localhost:5173
+      CORS_ALLOWED_ORIGINS: http://localhost:5173
+      JWT_SECRET: local-dev-secret-local-dev-secret-local-dev-secret
+      SEED_ENABLED: "true"
+      SEED_DEMO_DATA: "true"          # demo club, people and tasks; set to "false" for a clean start
+      SUPERADMIN_EMAIL: admin@clubflow.local
+      SUPERADMIN_PASSWORD: ChangeMe123!
+    ports:
+      - "8080:8080"
+    volumes:
+      - uploads:/app/uploads
+
+  frontend:
+    build: ./frontend   # nginx serves the app and forwards /api to the backend, so no CORS setup is needed
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  dbdata:
+  uploads:
