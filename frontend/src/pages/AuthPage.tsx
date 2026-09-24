@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { ApiError, errorMessage } from '@/lib/api';
 import { Button, Field, Input, Notice } from '@/components/ui';
+import { DotField } from '@/components/DotField';
 
 export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
   const { login, register } = useAuth();
@@ -38,8 +39,10 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
   }
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
-      <div className="hidden flex-col justify-between bg-ink p-12 text-white lg:flex">
+    <div className="relative grid min-h-screen overflow-hidden lg:grid-cols-[1.05fr_1fr]">
+      <DotField dotRadius={1.35} dotSpacing={20} cursorRadius={460} bulgeStrength={2} glowRadius={140} />
+
+      <div className="relative z-10 hidden flex-col justify-between bg-ink/94 p-12 text-white backdrop-blur-sm lg:flex">
         <div className="flex items-center gap-2.5">
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-marker-600">
             <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true">
@@ -67,7 +70,7 @@ export function AuthPage({ mode }: { mode: 'login' | 'register' }) {
         <p className="text-sm text-white/50">Built for college clubs.</p>
       </div>
 
-      <div className="flex items-center justify-center bg-chalk-100 px-5 py-10">
+      <div className="relative z-10 flex items-center justify-center bg-chalk-100/92 px-5 py-10 backdrop-blur-sm">
         <div className="w-full max-w-sm">
           <h2 className="font-display text-2xl font-bold text-ink">{isLogin ? 'Sign in to ClubFlow' : 'Join your club'}</h2>
           <p className="mt-1.5 text-sm text-ink-mute">
