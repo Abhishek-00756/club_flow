@@ -6,6 +6,7 @@ import { ROLE_LABEL } from '@/lib/format';
 import { Icon, type IconName } from './Icon';
 import { NotificationBell } from './NotificationBell';
 import { Avatar, IconButton, Select, cx } from './ui';
+import { DotField } from './DotField';
 
 interface NavItem {
   to: string;
@@ -173,9 +174,11 @@ export function Layout() {
   useEffect(() => setDrawer(false), [location.pathname]);
 
   return (
-    <div className="min-h-screen lg:pl-64">
+    <div className="relative min-h-screen overflow-x-clip lg:pl-64">
+      <DotField />
+
       {/* desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-chalk-200 bg-chalk-50 lg:flex">
+      <aside className="relative z-20 fixed inset-y-0 left-0 hidden w-64 flex-col border-r border-chalk-200 bg-chalk-50/92 backdrop-blur-md lg:flex">
         <div className="flex h-16 items-center border-b border-chalk-200">
           <Brand />
         </div>
@@ -202,7 +205,7 @@ export function Layout() {
         </div>
       )}
 
-      <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-chalk-200 bg-chalk-100/95 px-4 backdrop-blur sm:px-6">
+      <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-chalk-200 bg-chalk-100/82 px-4 backdrop-blur-md sm:px-6">
         <IconButton icon="menu" label="Open menu" className="lg:hidden" onClick={() => setDrawer(true)} />
         <div className="min-w-0 flex-1">
           {isSuper ? (
@@ -228,7 +231,7 @@ export function Layout() {
         <UserMenu />
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <main className="relative z-10 mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
         <Outlet />
       </main>
     </div>
