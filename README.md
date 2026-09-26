@@ -2,6 +2,19 @@
 
 Task assignment, review and reminders for a college club. A secretary creates and assigns work, members submit it, a reviewer approves it or sends it back with a reason, and the system does the chasing: reminders before a deadline, an alert when one is missed, and recurring tasks that create themselves.
 
+## Features
+
+- Task creation, assignment, submission and review workflow
+- Role-based permissions for members, secretaries, admins and super admins
+- Deadline reminders and overdue notifications
+- Recurring tasks and event-based task templates
+- JWT-based authentication
+- Club-level data isolation
+- Email notifications with retry support
+- Dashboard and reports for club management
+- Docker-based setup for quick local development
+
+
 - **Backend:** Spring Boot 3.3, Java 21, PostgreSQL, Flyway, JWT auth
 - **Frontend:** React 18, TypeScript, Tailwind CSS, TanStack Query, Vite
 
